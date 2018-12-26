@@ -1,0 +1,33 @@
+\documentclass[11pt]{article}
+%Gummi|065|=)
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\title{\textbf{Informática Gráfica}}
+\author{Prácticas 1, 2 y 3\\
+		Laura Gómez Garrido}
+\date{}
+\begin{document}
+
+\maketitle
+
+\section{Modelo jerárquico y lista de parámetros:}
+
+Se ha realizado un muñeco que será capaz de realizar movimientos simples como mover sus brazos y piernas, además de girarse y alzarse. Todos los parámetros comparten los siguientes valores: $v_0=0.0001$, $\Delta=0.0001$ y $a=0.00000001$.
+\begin{itemize}
+\item \textbf{Hombros(x2):} Matriz de Rotación respecto al eje x acotada. Tiene de valor central 90, semiamplitud 70 y una frecuencia de 0.06. Es una MediaExtremidad.
+\item \textbf{Codos(x2):} Matriz de Rotación respecto al eje x acotada. Tiene de valor central 50, semiamplitud 50 y una frecuencia de 0.06. Es una MediaExtremidad.
+\item \textbf{Giro Cuerpo(x1):} Matriz de Rotación respecto al eje y acotada. Tiene de valor central 0, semiamplitud 70 y una frecuencia de 0.03. Se mueve todo el Bailarín.
+\item \textbf{Levantar Cuerpo(x1):} Matriz de Traslación respecto al eje y acotada. Tiene de valor central 0, semiamplitud 2 y una frecuencia de 0.12. Se mueve todo el Bailarín.
+\item \textbf{Pierna(x2):} Matriz de Rotación respecto al eje x acotada. Tiene de valor central -40, semiamplitud 40 y una frecuencia de 0.12. Es una MediaExtremidad.
+\item \textbf{Rodilla(x2):} Matriz de Rotación respecto al eje x acotada. Tiene de valor central -50, semiamplitud 50 y una frecuencia de 0.12. Es una MediaExtremidad.
+\end{itemize}
+
+\newpage
+
+\section{Grafo de escena}
+\begin{center}
+	\begin{figure}[h]
+		\includegraphics[scale=0.6]{GrafoEscena}
+	\end{figure}
+\end{center}
+\end{document}

@@ -1,0 +1,35 @@
+#Prácticas de Informática Gráfica
+
+## P1: Visualización de Modelos Simples
+
+- El sistema operativo utilizado para su desarrollo es Ubuntu 18.04.1 LTS, con el procesador Intel® Core™ i7-4510U CPU @ 2.00GHz × 4  y los gráficos GeForce 820M/PCIe/SSE2.
+
+- Se ha hecho programación del cauce gráfico. Los archivos con los fuentes del shader son: simple_fs.glsl y simple_vs.glsl
+
+- En esta práctica no se ha implementado ninguna pulsación de tecla distinta a las solicitadas por el guión.
+
+- A la implementación del Cubo y del Tetraedro, en los ficheros de MallaInd, se les ha añadido nuevos constructores:
+    - Cubo();
+    - Cubo(float arista);
+    - Cubo(Tupla3f centro, float arista);
+    - Tetraedro();
+    - Tetraedro(float arista);
+    - Tetraedro(Tupla3f centro, float arista);
+    - Tetraedro(Tupla3f centro, std::vector<Tupla3f> vector);
+
+## P2: Modelos PLY y Poligonales
+- En esta práctica no se ha implementado ninguna pulsación de tecla distinta a las solicitadas por el guión.
+
+- Se han implementado la visualización en modo diferido con VBOs.
+
+- No se usa ningún archivo PLY distinto a los proporcionados.
+
+- A la implementación de la esfera, el cilindro y el cono se les añade la posibilidad de crearse con un radio y una altura distintos distintos al por defecto con otro constructor.
+
+## P3: Modelos jerárquicos:
+- Se añade la implementación de las siguientes teclas, extras a las solicitadas por el guión:
+  - '1' nuestro bailarín sube y baja los brazos.
+  - '2' nuestro bailarín se gira todo su cuerpo.
+  - '3' nuestro bailarín se agacha y se levanta.
+  - '8' hace lo mismo que '<' con la peculiaridad de que lo hace para todos los grados de libertad y no únicamente para el activo.
+  - '9' hace lo mismo que '>' con la peculiaridad de que lo hace para todos los grados de libertad y no únicamente para el activo.
