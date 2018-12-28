@@ -31,11 +31,13 @@ class MallaInd : public Objeto3D
 
       unsigned tam_ver; //tamaño en bytes de la tabla de vértices
       unsigned tam_tri; //tamaño en bytes de la tabla de triángulos
+      unsigned tam_tex;
 
       bool vbo_creado;
 
       GLuint id_vbo_color_ver;
       GLuint id_vbo_normal_ver;
+      GLuint id_vbo_textura_ver;
 
       std::vector<Tupla3f> color_ver;
       //std::vector<Tupla3f> color_tri;
@@ -65,7 +67,9 @@ class MallaInd : public Objeto3D
       void visualizarDE_MI( ContextoVis & cv );
       // visualizar con 'draw elements', en modo diferido (con VBOS)
       void visualizarDE_VBOs( ContextoVis & cv );
-
+      //Visualizar con Draw Elements, Normales y Texturas.
+      void visualizarDE_NT();
+      void visualizarVBOs_NT();
    public:
       // crea una malla vacía (nombre: "malla indexada nueva vacía")
       MallaInd() ;

@@ -29,8 +29,8 @@ MallaInd::MallaInd( const std::string & nombreIni )
   ponerNombre(nombreIni) ;
   vbo_creado=false;
   id_vbo_ver=id_vbo_tri=0;
-  id_vbo_color_ver=id_vbo_normal_ver=0;
-  tam_ver=tam_tri=0;
+  id_vbo_color_ver=id_vbo_normal_ver=id_vbo_textura_ver=0;
+  tam_ver=tam_tri=tam_tex=0;
 
 }
 // -----------------------------------------------------------------------------
@@ -38,7 +38,7 @@ MallaInd::MallaInd( const std::string & nombreIni )
 
 void MallaInd::calcular_normales()
 {
-
+  //std::cout << "Calculo normales"<<std::endl;
   assert(!vertices.empty() && !triangulos.empty());
   normal_ver=std::vector<Tupla3f>(vertices.size(),Tupla3f{0.0,0.0,0.0});
    // Primero, comenzamos calculando la tabla de 1normales de las caras.
@@ -82,6 +82,7 @@ GLuint MallaInd::VBO_Crear(GLuint tipo, GLuint tam, GLvoid * puntero){
 void MallaInd::crearVBOs(){
   tam_ver=sizeof(float)*3L*num_ver;
   tam_tri=sizeof(unsigned)*3L*num_tri;
+  tam_tex=sizeof(float)*2L*coordenadas_textura.size();
   // crear VBO conteniendo la tabla de vértices
   id_vbo_ver=VBO_Crear(GL_ARRAY_BUFFER, tam_ver, vertices.data());
   // crear VBO conteniendo la tabla de tríangulos (índices de vértices)
@@ -90,8 +91,11 @@ void MallaInd::crearVBOs(){
   if(color_ver.size()>0)
     id_vbo_color_ver=VBO_Crear(GL_ARRAY_BUFFER,tam_ver,color_ver.data());
 
-/*  if(normal_ver.size()>0)
-    id_vbo_normal_ver=VBO_Crear(GL_ARRAY_BUFFER,tam_ver,normal_ver.data());*/
+  if(normal_ver.size()>0)
+    id_vbo_normal_ver=VBO_Crear(GL_ARRAY_BUFFER,tam_ver,normal_ver.data());
+
+  if(coordenadas_textura.size()>0)
+    id_vbo_textura_ver=VBO_Crear(GL_ARRAY_BUFFER,tam_tex,coordenadas_textura.data());
 
   vbo_creado=true;
 }
@@ -121,7 +125,7 @@ void MallaInd::visualizarBE(){
       //leer y enviar coordenadas del vértice j del triángulo i
       unsigned indice_ver=triangulos[i](j);
       if(color_ver.size()>0) glColor3fv(color_ver[indice_ver]);
-      //if(normal_ver.size()>0) glNormal3fv(normal_ver[indice_ver]);
+      if(normal_ver.size()>0) glNormal3fv(normal_ver[indice_ver]);
       glVertex3fv(vertices[indice_ver]); //triangulos[i](j) < num_ver
 
     }
@@ -137,10 +141,10 @@ void MallaInd::visualizarBE(){
 void MallaInd::visualizarDE_MI( ContextoVis & cv )
 {
   //Hablitar y especificar normales.
-  /*if(normal_ver.size()>0){
+  if(normal_ver.size()>0){
     glEnableClientState(GL_NORMAL_ARRAY);
     glNormalPointer(GL_FLOAT,0,normal_ver.data());
-  }*/
+  }
   //Habilitar y especificar colores.
   if(color_ver.size()>0){
     glEnableClientState(GL_COLOR_ARRAY);
@@ -162,6 +166,22 @@ void MallaInd::visualizarDE_MI( ContextoVis & cv )
   glDisableClientState(GL_COLOR_ARRAY);
 }
 
+void MallaInd::visualizarDE_NT(){
+  glVertexPointer(3,GL_FLOAT,0,vertices.data());
+  glTexCoordPointer(2,GL_FLOAT,0,coordenadas_textura.data());
+  glNormalPointer(GL_FLOAT,0,normal_ver.data());
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_NORMAL_ARRAY);
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+  glDrawElements(GL_TRIANGLES,3*num_tri,GL_UNSIGNED_INT,triangulos.data());
+
+  glDisableClientState(GL_VERTEX_ARRAY);
+  glDisableClientState(GL_NORMAL_ARRAY);
+  glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+}
+
 // ----------------------------------------------------------------------------
 void MallaInd::visualizarDE_VBOs( ContextoVis & cv ){
   if(!vbo_creado) crearVBOs();
@@ -171,11 +191,11 @@ void MallaInd::visualizarDE_VBOs( ContextoVis & cv ){
     glColorPointer(3,GL_FLOAT,0,0);
     glEnableClientState(GL_COLOR_ARRAY);
   }
-  /*if(normal_ver.size()>0){
+  if(normal_ver.size()>0){
     glBindBuffer(GL_ARRAY_BUFFER,id_vbo_normal_ver);
     glNormalPointer(GL_FLOAT,0,0);
     glEnableClientState(GL_NORMAL_ARRAY);
-  }*/
+  }
   glBindBuffer(GL_ARRAY_BUFFER,id_vbo_ver);
   glVertexPointer(3, GL_FLOAT, 0, 0); //formato y offset (=0)
   glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -188,8 +208,38 @@ void MallaInd::visualizarDE_VBOs( ContextoVis & cv ){
 
   glDisableClientState(GL_VERTEX_ARRAY);
   glDisableClientState(GL_COLOR_ARRAY);
-  //glDisableClientState(GL_NORMAL_ARRAY);
+  glDisableClientState(GL_NORMAL_ARRAY);
 
+}
+
+void MallaInd::visualizarVBOs_NT(){
+  //Igual que el otro pero con texturas en lugar de colores.
+
+  if(!vbo_creado) crearVBOs();
+
+  if(coordenadas_textura.size()>0){
+    glBindBuffer(GL_ARRAY_BUFFER,id_vbo_textura_ver);
+    glTexCoordPointer(2,GL_FLOAT,0,0);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  }
+  if(normal_ver.size()>0){
+    glBindBuffer(GL_ARRAY_BUFFER,id_vbo_normal_ver);
+    glNormalPointer(GL_FLOAT,0,0);
+    glEnableClientState(GL_NORMAL_ARRAY);
+  }
+  glBindBuffer(GL_ARRAY_BUFFER,id_vbo_ver);
+  glVertexPointer(3, GL_FLOAT, 0, 0); //formato y offset (=0)
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glEnableClientState(GL_VERTEX_ARRAY); //activar uso vertex array
+
+  //visualizar con glDrawElements (puntero a tabla==NULL)
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_vbo_tri);
+  glDrawElements(GL_TRIANGLES, 3L*num_tri, GL_UNSIGNED_INT, NULL);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+  glDisableClientState(GL_VERTEX_ARRAY);
+  glDisableClientState(GL_NORMAL_ARRAY);
+  glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
 // -----------------------------------------------------------------------------
@@ -197,30 +247,66 @@ void MallaInd::visualizarDE_VBOs( ContextoVis & cv ){
 void MallaInd::visualizarGL( ContextoVis & cv )
 {
   GLenum mode;
+  GLenum sombra;
+  unsigned uso=0;
   switch(cv.modoVis) {
     case modoSolido:
       mode = GL_FILL;
+      sombra = GL_SMOOTH;
       break;
     case modoPuntos:
       mode = GL_POINT;
+      sombra = GL_FLAT;
+      break;
+    case modoMateriales:
+      mode = GL_FILL;
+      sombra = GL_SMOOTH;
+      uso=2;
+      break;
+    case modoColorNodoPlano:
+      mode = GL_FILL;
+      sombra = GL_FLAT;
+      uso=2;
+      break;
+    case modoColorNodoSuave:
+      mode = GL_FILL;
+      sombra = GL_SMOOTH;
+      uso=2;
       break;
     case modoAlambre:  // modo por defecto
     default:
       mode = GL_LINE;
+      sombra=GL_FLAT;
   }
 
   glPolygonMode(GL_FRONT_AND_BACK, mode);
-  glShadeModel(GL_SMOOTH);
+  glShadeModel(sombra);
 
   if(color_ver.empty()){
     ponerColores();
     //std::cout << "entro" <<std::flush;
   }
+  if(normal_ver.empty()){
+    calcular_normales();
+  }
   // Visualizar
   if (cv.usarVBOs)
-    visualizarDE_VBOs(cv);
-  else
-    visualizarDE_MI(cv);
+    uso++;
+
+  switch (uso) {
+    case 3:
+      visualizarVBOs_NT();
+      break;
+    case 2:
+      visualizarDE_NT();
+      break;
+    case 1:
+      visualizarDE_VBOs(cv);
+      break;
+    case 0:
+    default:
+      visualizarDE_MI(cv);
+  }
 }
 // *****************************************************************************
 

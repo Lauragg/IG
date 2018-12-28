@@ -82,6 +82,8 @@ EntradaNGE::~EntradaNGE()
 
 void NodoGrafoEscena::visualizarGL( ContextoVis & cv )
 {
+  cv.pilaMateriales.push();
+
   glMatrixMode(GL_MODELVIEW);
   glPushMatrix();
 
@@ -92,11 +94,14 @@ void NodoGrafoEscena::visualizarGL( ContextoVis & cv )
     else if (entradas[i].tipo == TipoEntNGE::transformacion) {
       glMatrixMode(GL_MODELVIEW);
       glMultMatrixf(*(entradas[i].matriz));
+    }else if (entradas[i].tipo == TipoEntNGE::material){
+      cv.pilaMateriales.activarMaterial(entradas[i].material);
     }
   }
 
   glMatrixMode(GL_MODELVIEW);
   glPopMatrix();
+  cv.pilaMateriales.pop();
 }
 // -----------------------------------------------------------------------------
 
@@ -347,4 +352,26 @@ void Bailarin::girarse(){
 void Bailarin::agacharse(){
   for(unsigned i=5; i<numParametros();i++)
     parametros[i].siguiente_cuadro();
+}
+
+Peones::PeonMadera::PeonMadera(){
+  agregar(MAT_Traslacion(Tupla3f{-5.0,0.0,0.0}));
+  agregar(new MaterialPeonMadera());
+  agregar(new MallaRevol("../plys/peon.ply",10,true,true,true));
+}
+Peones::PeonBlanco::PeonBlanco(){
+  agregar(MAT_Traslacion(Tupla3f{0.0,0.0,0.0}));
+  agregar(new MaterialPeonBlanco());
+  agregar(new MallaRevol("../plys/peon.ply",10,true,true,true));
+}
+Peones::PeonNegro::PeonNegro(){
+  agregar(MAT_Traslacion(Tupla3f{5.0,0.0,0.0}));
+  agregar(new MaterialPeonNegro);
+  agregar(new MallaRevol("../plys/peon.ply",10,true,true,true));
+}
+Peones::Peones(){
+  agregar(new PeonMadera());
+  agregar(new PeonBlanco());
+  agregar(new PeonNegro());
+
 }

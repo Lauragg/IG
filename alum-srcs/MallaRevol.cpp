@@ -35,7 +35,7 @@ MallaRevol::MallaRevol( const std::string & nombre_arch,
 
   ponerColores();
   // calcular la tabla de normales
-  //calcular_normales();
+  calcular_normales();
   num_tri=triangulos.size();
 
 
@@ -121,6 +121,7 @@ void MallaRevol::crearTablaTextura(){
       coordenadas_textura.push_back(Tupla2f{(float)i/(float)(nper-1),distancia[j]/distancia[nvp-1]});
     }
   }
+  std::cout<<"Creada Tabla Textura"<<std::endl;
 
 }
 

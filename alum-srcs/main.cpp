@@ -615,7 +615,7 @@ void Inicializa_OpenGL( )
    glEnable( GL_CULL_FACE );
 
    // establecer color de fondo: (1,1,1) (blanco)
-   glClearColor( 1.0, 1.0, 1.0, 1.0 ) ;
+   glClearColor( 0.9, 0.9, 0.9, 1.0 ) ;
 
    // establecer color inicial para todas las primitivas
    glColor3f( 0.7, 0.2, 0.4 ) ;

@@ -191,6 +191,7 @@ class Material
       tra ;          // reflectividades de caras traseras, si iluminacion=true
 } ;
 
+
 //**********************************************************************
 // Clase FuenteLuz
 // ---------------
@@ -205,24 +206,28 @@ class FuenteLuz
    // p_longi_ini == valor inicial del ángulo horizontal en grados
    // p_lati_ini  == idem del ángulo vértical
    // p_color     == color de la fuente de luz (amb, dif y spec )
-   FuenteLuz( GLfloat p_longi_ini, GLfloat p_lati_ini, const VectorRGB & p_color ) ;
+   //FuenteLuz( GLfloat p_longi_ini, GLfloat p_lati_ini, const VectorRGB & p_color ) ;
+   FuenteLuz(const VectorRGB & p_color);
 
    // cambia el estado de OpenGL de forma que a partir de la llamada
    // se usará esta fuente de luz en los calculos del MIL
    // (en cada momento puede haber varias fuentes activadas)
-   void activar() ;
+   virtual void activar() = 0;
 
    // cambia los atributos de la instancia en respuesta a una pulsación
    // de una tecla 'especial' (según la terminología de 'glut')
-   bool gestionarEventoTeclaEspecial( int key ) ;
+   virtual bool gestionarEventoTeclaEspecial( int key ) = 0;
+   virtual void variarAngulo(unsigned angulo, float incremento) = 0;
+
+   ~FuenteLuz(){}
 
    //-------------------------------------------------------------------
    // variables de instancia:
 
-public:
+/* public:
     float
       longi,      // longitud actual de la fuente direccional (en grados, entre 0 y 360)
-      lati ;      // latitud actual de la fuente direccional (en grados, entre -90 y 90)
+      lati ;      // latitud actual de la fuente direccional (en grados, entre -90 y 90)*/
 protected:
    VectorRGB
       col_ambiente,  // color de la fuente para la componente ambiental
@@ -230,12 +235,41 @@ protected:
       col_especular; // color de la fuente para la componente especular
    GLenum
       ind_fuente ;// indice de la fuente de luz en el vector, se asigna al insertarlo
-   float
+   /*float
       longi_ini,  // valor inicial de 'longi'
-      lati_ini ;  // valor inicial de 'lati'
+      lati_ini ;  // valor inicial de 'lati'*/
 
    friend class ColFuentesLuz ;
 } ;
+
+class FuenteDireccional : public FuenteLuz{
+  public:
+    float
+      longi,      // longitud actual de la fuente direccional (en grados, entre 0 y 360) (ALPHA)
+      lati ;      // latitud actual de la fuente direccional (en grados, entre -90 y 90) (BETA)
+    const float
+       longi_ini,  // valor inicial de 'longi'
+       lati_ini ;  // valor inicial de 'lati'
+    // Inicializar la fuente de Fuente de Luz
+    FuenteDireccional(float alpha_inicial, float beta_inicial, const VectorRGB & p_color);
+
+    void activar();
+    bool gestionarEventoTeclaEspecial(int key);
+
+    //Cambiar ángulo
+    //(ángulo==0->variar alpha,angulo==1 variar beta)
+    void variarAngulo(unsigned angulo, float incremento);
+
+};
+
+class FuentePosicional : public FuenteLuz{
+  public:
+    Tupla3f posicion;
+    FuentePosicional(const Tupla3f & posicion, const VectorRGB & p_color);
+    void activar();
+    bool gestionarEventoTeclaEspecial(int key);
+    void variarAngulo(unsigned angulo, float incremento){} //Definida por comodidad pero no hace nada
+};
 
 //**********************************************************************
 // Clase ConjuntoFuentes
@@ -250,9 +284,32 @@ class ColFuentesLuz
    void insertar( FuenteLuz * pf ) ; // inserta una nueva
    void activar( unsigned id_prog ); // activa las fuentes de luz
    FuenteLuz * ptrFuente( unsigned i ); // devuelve ptr a la fuente de luz numero i
+   unsigned numFuentes() const{return vpf.size();} //Necesario para poder iterar de forma cutre.
 
    private:
    std::vector<FuenteLuz *> vpf ; // vector de punteros a fuentes
    GLint max_num_fuentes ;
 } ;
+
+class MaterialLata : public Material{
+  public:
+    MaterialLata();
+};
+class MaterialTapasLata : public Material{
+  public:
+    MaterialTapasLata();
+};
+class MaterialPeonMadera : public Material{
+  public:
+    MaterialPeonMadera();
+};
+class MaterialPeonBlanco : public Material{
+  public:
+    MaterialPeonBlanco();
+};
+class MaterialPeonNegro : public Material{
+  public:
+    MaterialPeonNegro();
+};
+
 #endif

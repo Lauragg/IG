@@ -47,6 +47,16 @@ class MallaRevol : public MallaInd
                   const bool     crear_tapas,
                   const bool     cerrar_malla ) ;
 
+      MallaRevol( const std::string & nombre_arch,
+                  const unsigned nperfiles,
+                  const bool     crear_tapas,
+                  const bool     cerrar_malla,
+                  const bool     crear_textura )
+          : MallaRevol(nombre_arch,nperfiles,crear_tapas,cerrar_malla){
+            if(crear_textura)
+              crearTablaTextura();
+          }
+
 } ;
 
 class Toro : public MallaRevol{

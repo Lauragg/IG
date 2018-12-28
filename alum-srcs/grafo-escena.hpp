@@ -170,6 +170,26 @@ class Bailarin : public NodoGrafoEscenaParam{
     void agacharse();
 };
 
+class Peones : public NodoGrafoEscenaParam{
+  protected:
+
+    class PeonMadera : public NodoGrafoEscena{
+      public:
+        PeonMadera();
+    };
+    class PeonBlanco : public NodoGrafoEscena{
+      public:
+        PeonBlanco();
+    };
+    class PeonNegro : public NodoGrafoEscena{
+      public:
+        PeonNegro();
+    };
+
+  public:
+    Peones();
+};
+
 #endif // GRAFO_ESCENA_HPP
 
 // *********************************************************************
