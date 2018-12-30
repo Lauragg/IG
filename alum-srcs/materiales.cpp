@@ -97,6 +97,7 @@ void Textura::enviar()
      glTexGenfv(GL_S,GL_EYE_PLANE,coefs_s);
      glTexGenfv(GL_T,GL_EYE_PLANE,coefs_t);
    }
+   glBindTexture(GL_TEXTURE_2D,ident_textura);
    gluBuild2DMipmaps(GL_TEXTURE_2D,GL_RGB,imagen->tamX(),imagen->tamY(),GL_RGB,GL_UNSIGNED_BYTE,imagen->leerPixels() );
    enviada=true;
 
