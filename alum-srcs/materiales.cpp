@@ -553,7 +553,7 @@ MaterialPeonMadera::MaterialPeonMadera()
 }
 MaterialPeonBlanco::MaterialPeonBlanco()
 : Material(NULL,0.0,1,0,0){
-  del.emision=tra.emision=Tupla4f{1,1,1,1.0};
+  del.emision=tra.emision=Tupla4f{0.9,0.9,0.9,1.0};
 
 }
 MaterialPeonNegro::MaterialPeonNegro()
