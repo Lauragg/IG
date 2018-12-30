@@ -357,21 +357,45 @@ void Bailarin::agacharse(){
 Peones::PeonMadera::PeonMadera(){
   agregar(MAT_Traslacion(Tupla3f{-5.0,0.0,0.0}));
   agregar(new MaterialPeonMadera());
-  agregar(new MallaRevol("../plys/peon.ply",10,true,true,true));
+  agregar(new MallaRevol("../plys/peon.ply",10,true,false,true));
 }
 Peones::PeonBlanco::PeonBlanco(){
   agregar(MAT_Traslacion(Tupla3f{0.0,0.0,0.0}));
   agregar(new MaterialPeonBlanco());
-  agregar(new MallaRevol("../plys/peon.ply",10,true,true,true));
+  agregar(new MallaRevol("../plys/peon.ply",10,true,false,true));
 }
 Peones::PeonNegro::PeonNegro(){
   agregar(MAT_Traslacion(Tupla3f{5.0,0.0,0.0}));
   agregar(new MaterialPeonNegro);
-  agregar(new MallaRevol("../plys/peon.ply",10,true,true,true));
+  agregar(new MallaRevol("../plys/peon.ply",10,true,false,true));
 }
 Peones::Peones(){
   agregar(new PeonMadera());
   agregar(new PeonBlanco());
   agregar(new PeonNegro());
 
+}
+
+CocaCola::Cuerpo::Cuerpo(){
+  agregar(MAT_Traslacion(Tupla3f{0.0,0.0,0.0}));
+  agregar(new MaterialLata());
+  agregar(new MallaRevol("../plys/lata-pcue.ply",10,true,false,true));
+}
+
+CocaCola::TapaArriba::TapaArriba(){
+  agregar(MAT_Traslacion(Tupla3f{0.0,0.0,0.0}));
+  agregar(new MaterialTapasLata());
+  agregar(new MallaRevol("../plys/lata-psup.ply",10,true,false,true));
+}
+
+CocaCola::TapaAbajo::TapaAbajo(){
+  agregar(MAT_Traslacion(Tupla3f{0.0,0.0,0.0}));
+  agregar(new MaterialTapasLata());
+  agregar(new MallaRevol("../plys/lata-pinf.ply",10,true,false,true));
+}
+
+CocaCola::CocaCola(){
+  agregar(new TapaArriba());
+  agregar(new Cuerpo());
+  agregar(new TapaAbajo());
 }

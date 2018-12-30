@@ -34,7 +34,7 @@ void P4_Inicializar(  )
    // COMPLETAR: práctica 4: inicializar objetos de la práctica 4
    fuentes4.insertar(new FuenteDireccional(-10,30,Tupla4f{0.5,0.4,0,1.0}));
    objetos4[0]=new Peones();
-
+   objetos4[1]=new CocaCola();
    cout << "hecho." << endl << flush ;
 }
 
@@ -76,6 +76,18 @@ bool P4_FGE_PulsarTeclaCaracter( unsigned char tecla )
          res=true;
 
          break ;
+
+      case 'O' :
+        objetoActivo4 = (objetoActivo4+1) % numObjetos4 ;
+        cout << "práctica 4: nuevo objeto activo es: " << objetoActivo4 ;
+        if ( objetos4[objetoActivo4] != nullptr )
+           cout << " (" << objetos4[objetoActivo4]->leerNombre() << ")." << endl ;
+        else
+           cout << " (objeto no creado)" << endl ;
+
+        res=true;
+        break;
+
       default :
          break ;
    }

@@ -503,7 +503,7 @@ void ColFuentesLuz::insertar( FuenteLuz * pf )  // inserta una nueva
 void ColFuentesLuz::activar( unsigned id_prog )
 {
    // COMPLETAR: práctica 4: activar una colección de fuentes de luz
-   if(id_prog==2 || id_prog==3){
+   if(id_prog==3 || id_prog==4){
      for(unsigned i=0; i<vpf.size();i++){
        vpf[i]->activar();
      }
@@ -539,14 +539,15 @@ ColFuentesLuz::~ColFuentesLuz()
 **
 **
 ************************************************************************/
-MaterialLata::MaterialLata(){
+MaterialLata::MaterialLata()
+ : Material(new Textura("../imgs/lata-coke.jpg"),0.0,1,1,1){
 
 }
-MaterialTapasLata::MaterialTapasLata(){
-
+MaterialTapasLata::MaterialTapasLata()
+ : Material(NULL,0.0,1,1,1){
+   del.emision=tra.emision=Tupla4f{0.2,0.2,0.2,1.0};
 }
 MaterialPeonMadera::MaterialPeonMadera()
-
 : Material(new Textura("../imgs/text-madera.jpg"),0.0,1,1,1){
   del.emision=tra.emision=Tupla4f{0.5,0.5,0.5,1.0};
 }

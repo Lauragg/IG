@@ -190,6 +190,28 @@ class Peones : public NodoGrafoEscenaParam{
     Peones();
 };
 
+class CocaCola : public NodoGrafoEscenaParam{
+  protected:
+
+    class Cuerpo : public NodoGrafoEscena{
+      public:
+        Cuerpo();
+    };
+
+    class TapaArriba : public NodoGrafoEscena{
+      public:
+        TapaArriba();
+    };
+
+    class TapaAbajo : public NodoGrafoEscena{
+      public:
+        TapaAbajo();
+    };
+
+  public:
+    CocaCola();
+};
+
 #endif // GRAFO_ESCENA_HPP
 
 // *********************************************************************
