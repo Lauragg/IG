@@ -51,14 +51,30 @@ void CamaraInteractiva::calcularViewfrustum(  )
    {
       // COMPLETAR: práctica 5: calcular los parámetros del view frustum (vf), y actualiza la matriz de proyección (vf.matrizProy)
       // caso perspectiva: usar hfov_grad, n, ratio_yx_vp, dist, función MAT_Frustum
-      // .....
+      //ASUMIMOS QUE NEAR Y FAR NO CAMBIAN ¿Aquí es donde se usa dist?
+      assert(epsilon < hfov_grad);
+      float hfov_rad=(hfov_grad*M_PI)/180.0;
+      vf.persp=true;
+      vf.top=vf.near*tan(0.5*hfov_rad);
+      vf.bottom=-vf.bottom;
+      vf.right=vf.top*ratio_yx_vp;
+      vf.left=-vf.right;
+
+      vf.matrizProy=MAT_Frustum(vf.left,vf.right,vf.bottom,vf.top,vf.near,vf.far);
 
    }
    else
    {
       // COMPLETAR: práctica 5: calcular los parámetros del view frustum (vf), y actualiza la matriz de proyección (vf.matrizProy)
       // caso ortográfica: usar ratio_yx_vp, dist, función MAT_Ortografica
-      // .....
+      vf.persp=false;
+      /*vf.left=;
+      vf.right=;
+      vf.bottom=;
+      vf.top=;
+      vf.near=;
+      vf.far=;*/
+      vf.matrizProy=MAT_Ortografica(vf.left,vf.right,vf.bottom,vf.top,vf.near,vf.far);
 
    }
 
@@ -75,9 +91,20 @@ void CamaraInteractiva::calcularMarcoCamara()
    //    (1) Matriz = Trasl( aten )*Rotacion( longi, Y )*Rotacion( -lati, X )* Traslacion( (0,0,dist) )
    //    (2) ejes mcv = ejes mcv * matriz
    //    (3) recalcular matrices marco camara
-   // .....
+
+//(1) Asumo que longi y lati ya están en radianes.
+  Matriz4f matriz=MAT_Traslacion(aten)*MAT_Rotacion(longi,0.0,1.0,0.0)
+  *MAT_Rotacion(-lati,1.0,0.0,0.0)*MAT_Traslacion(0,0,dist);
+
+//(2)
+
+/*  mcv.eje[0]=mcv.eje[0]*matriz;
+  mcv.eje[1]=mcv.eje[1]*matriz;
+  mcv.eje[2]=mcv.eje[2]*matriz;*/
 
 
+//(3)
+  recalcularMatrMCV();
 }
 
 
@@ -87,8 +114,10 @@ void CamaraInteractiva::calcularMarcoCamara()
 
 void CamaraInteractiva::recalcularMatrMCV()
 {
-   // COMPLETAR: práctica 5: recalcular 'mcv.matrizVista' y 'mcv.matriVistaInv' en 'mcv' usando 'mcv.eje[X/Y/Z]' y 'mcv.org'
-   // .....
+   // COMPLETAR: práctica 5: recalcular 'mcv.matrizVista' y 'mcv.matriVistaInv'
+   //en 'mcv' usando 'mcv.eje[X/Y/Z]' y 'mcv.org'
+   mcv.matrizVista=MAT_Vista(mcv.eje,mcv.org);
+   mcv.matrizVistaInv=MAT_Vista_inv(mcv.eje,mcv.org);
 
 }
 
@@ -109,16 +138,20 @@ void CamaraInteractiva::moverHV( float nh, float nv )
    if ( examinar ) // examinar
    {
       // COMPLETAR: práctica 5: actualizar 'longi' y 'lati' y recalcular marco de cámara
-      // .....
-
+      longi=longi+nh*urot; //OJO, EN MAIN LO HACEN CON RESTARLE EL PRODUCTO.
+      lati=lati+nv*urot;
    }
    else // primer persona
    {
       // COMPLETAR: práctica 5: desplazar 'mcv.org' en X e Y y recalcular la matriz de vista
       // (y movimiento solidario del punto de atención)
-      // .....
-
+      mcv.org[0]+=nh*udesp;
+      mcv.org[1]+=nv*udesp;
+      aten[0]+=nh*udesp;
+      aten[1]+=nv*udesp;
    }
+
+    calcularMarcoCamara();
 }
 // -----------------------------------------------------------------------------
 // desplazar en el eje Z de la cámara (hacia adelante o hacia detrás)
@@ -133,16 +166,17 @@ void CamaraInteractiva::desplaZ( float nz )
    if ( examinar ) // examinar
    {
       // COMPLETAR: práctica 5: actualizar 'dist' usando 'nz', 'dmin' y 'porc' y recalcular marco de cámara
-      // .....
-
+      dist=dmin + (dist-dmin)*(1.0-nz*porc/100.0);
    }
    else // primer persona
    {
       // COMPLETAR: práctica 5: desplazar 'mcv.org' en Z, y recalcular la matriz de vista
       // (y movimiento solidario del punto de atención)
-      // .....
-
+      mcv.org[2]=nz*udesp;
+      aten[2]+=nz*udesp;
    }
+
+  calcularMarcoCamara();
 
 }
 // -----------------------------------------------------------------------------
@@ -158,8 +192,9 @@ void CamaraInteractiva::desplaZ( float nz )
 void CamaraInteractiva::modoExaminar( const Tupla3f & pAten )
 {
    // COMPLETAR: práctica 5: fija punt. aten. y activa modo examinar, recalcula marco de camara
-   // .....
-
+   examinar=true;
+   aten=pAten;
+   calcularMarcoCamara();
 }
 // -----------------------------------------------------------------------------
 // pasa a modo examinar (mantiene p.aten.)
@@ -167,7 +202,7 @@ void CamaraInteractiva::modoExaminar( const Tupla3f & pAten )
 void CamaraInteractiva::modoExaminar()
 {
    // COMPLETAR: práctica 5: activa modo examinar (no es necesario recalcular el marco de cámara)
-   // .....
+   examinar=true;
 
 }
 // -----------------------------------------------------------------------------
@@ -176,6 +211,6 @@ void CamaraInteractiva::modoExaminar()
 void CamaraInteractiva::modoPrimeraPersona()
 {
    // COMPLETAR: práctica 5: activa modo primera persona (no es necesario recalcular el marco de cámara)
-   // .....
+   examinar=false;
 
 }

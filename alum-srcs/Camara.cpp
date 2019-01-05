@@ -25,7 +25,7 @@
 #include "aux.hpp"
 #include "Camara.hpp"
 
-const float epsilon = 1e-6 ;
+
 
 // ---------------------------------------------------------------------
 // funciones auxiliares para generar matrices:

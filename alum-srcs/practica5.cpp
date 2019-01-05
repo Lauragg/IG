@@ -9,6 +9,7 @@
 #include "tuplasg.hpp"   // Tupla3f
 #include "practicas.hpp"
 #include "practica5.hpp"
+#include "grafo-escena.hpp"
 
 #include "CamaraInter.hpp"
 
@@ -17,12 +18,18 @@ using namespace std ;
 // COMPLETAR: práctica 5: declarar variables de la práctica 5 (static)
 //    (escena, viewport, el vector de camaras, y las variables
 //      que sirven para gestionar el modo arrastrar)
-// ......
+static unsigned objetoActivo5 = 0 ; // objeto activo: malla ply (0), malla revol (1)
+static constexpr int numObjetos5 = 2 ;
+static NodoGrafoEscena * objetos5[numObjetos5] = { nullptr,nullptr };
+static unsigned camaraActiva=0;
+static constexpr int numCamaras = 4;
+static CamaraInteractiva * camaras[numCamaras]={nullptr,nullptr,nullptr,nullptr};
 
 // viewport actual (se recalcula al inicializar y al fijar las matrices)
 Viewport viewport ;
 // true si se está en modo arrastrar, false si no
 static bool modo_arrastrar = false ;
+static int arrastrar_x0,arrastrar_y0;
 
 
 // ---------------------------------------------------------------------
@@ -31,7 +38,10 @@ void P5_Inicializar(  int vp_ancho, int vp_alto )
 {
    cout << "Creando objetos de la práctica 5 .... " << flush ;
    // COMPLETAR: práctica 5: inicializar las variables de la práctica 5 (incluyendo el viewport)
-   // .......
+   viewport=Viewport(0,0,vp_ancho,vp_alto);
+   //Añadimos algunos de los objetos de anteriores prácticas.
+
+   //Añadimos cámaras interactivas.
 
    cout << "hecho." << endl << flush ;
 }
@@ -41,7 +51,10 @@ void P5_FijarMVPOpenGL( int vp_ancho, int vp_alto )
 {
    // COMPLETAR: práctica 5: actualizar viewport, actualizar y activar la camara actual
    //     (en base a las dimensiones del viewport)
-   // .......
+   viewport.ancho=vp_ancho;
+   viewport.alto=vp_alto;
+   camaras[camaraActiva]->ratio_yx_vp=vp_alto/vp_ancho; //FIXME: ¿QUÉ VALOR PONGO AQUÍ?
+   camaras[camaraActiva]->calcularViewfrustum();
 
 
 }
@@ -67,25 +80,29 @@ bool P5_FGE_PulsarTeclaCaracter(  unsigned char tecla )
    {
       case 'C':
          // COMPLETAR: práctica 5: activar siguiente camara
-         // .....
+         camaraActiva=(camaraActiva+1)%numCamaras;
+         camaras[camaraActiva]->activar();
 
          break ;
 
       case 'V':
          // COMPLETAR: práctica 5: conmutar la cámara actual entre modo examinar y el modo primera persona
-         // .....
+        if(camaras[camaraActiva]->examinar)
+          camaras[camaraActiva]->modoPrimeraPersona();
+        else
+          camaras[camaraActiva]->modoExaminar();
 
          break ;
 
       case '-':
          // COMPLETAR: práctica 5: desplazamiento en Z de la cámara actual (positivo) (desplaZ)
-         // .....
+         camaras[camaraActiva]->desplaZ(0.1);
 
          break;
 
       case '+':
          // COMPLETAR: práctica 5: desplazamiento en Z de la cámara actual (negativo) (desplaZ)
-         // .....
+         camaras[camaraActiva]->desplaZ(-0.1);
 
          break;
 
@@ -107,22 +124,22 @@ bool P5_FGE_PulsarTeclaEspecial(  int tecla  )
    {
       case GLFW_KEY_LEFT:
          // COMPLETAR: práctica 5: desplazamiento/rotacion hacia la izquierda (moverHV)
-         // .....
+         camaras[camaraActiva]->moverHV(-3.0,0.0);
 
          break;
       case GLFW_KEY_RIGHT:
          // COMPLETAR: práctica 5: desplazamiento/rotación hacia la derecha (moverHV)
-         // .....
+         camaras[camaraActiva]->moverHV(+3.0,0.0);
 
          break;
       case GLFW_KEY_UP:
          // COMPLETAR: práctica 5: desplazamiento/rotación hacia arriba (moverHV)
-         // .....
+         camaras[camaraActiva]->moverHV(0.0,+3.0);
 
          break;
       case GLFW_KEY_DOWN:
          // COMPLETAR: práctica 5: desplazamiento/rotación hacia abajo (moverHV)
-         // .....
+         camaras[camaraActiva]->moverHV(0.0,-3.0);
 
          break;
       default:
@@ -140,9 +157,10 @@ void P5_ClickIzquierdo( int x, int y )
 
    // COMPLETAR: práctica 5: visualizar escena en modo selección y leer el color del pixel en (x,y)
 
-
    // 1. crear un 'contextovis' apropiado
-   // .....
+   ContextoVis contextovis;
+   contextovis.modoSeleccionRB=true; // true -> dibujando en modo selección usando render buffer de opengl
+   //contextovis.modoSeleccionFBO=true; // true -> dibujando en modo selección con FBO invisible (puede ser el back-buffer)
 
    // 2. visualizar en modo selección (sobre el backbuffer)
    // ....
@@ -154,13 +172,16 @@ void P5_ClickIzquierdo( int x, int y )
    // .....
 
 }
+// --------------------------------------------------------------------
 // ---------------------------------------------------------------------
 // se llama al mover el botón en modo arrastrar
 
 void P5_InicioModoArrastrar( int x, int y )
 {
    // COMPLETAR: práctica 5: activar bool de modo arrastrar, registrar (x,y) de inicio del modo arrastrar
-   // .....
+   modo_arrastrar=true;
+   arrastrar_x0=x;
+   arrastrar_y0=y;
 
 }
 // ---------------------------------------------------------------------
@@ -169,7 +190,7 @@ void P5_InicioModoArrastrar( int x, int y )
 void P5_FinModoArrastrar()
 {
    // COMPLETAR: práctica 5: desactivar bool del modo arrastrar
-   // .....
+   camaras[camaraActiva]->modo_arrastrar=false;
 
 }
 // ---------------------------------------------------------------------
@@ -178,7 +199,7 @@ void P5_FinModoArrastrar()
 void P5_RatonArrastradoHasta( int x, int y )
 {
    // COMPLETAR: práctica 5: calcular desplazamiento desde inicio de modo arrastrar, actualizar la camara (moverHV)
-   // .....
+   camaras[camaraActiva]->moverHV(x-arrastrar_x0,y-arrastrar_y0);
 
 
 }
@@ -215,7 +236,7 @@ bool P5_FGE_RatonMovidoPulsado( int x, int y )
 bool P5_FGE_Scroll( int direction )
 {
    // COMPLETAR: práctica 5: acercar/alejar la camara (desplaZ)
-   // .....
+   camaras[camaraActiva]->desplaZ(direction)
 
    return true ;
 }
@@ -224,15 +245,21 @@ bool P5_FGE_Scroll( int direction )
 void FijarColorIdent( const int ident )  // 0 ≤ ident < 2^24
 {
    // COMPLETAR: práctica 5: fijar color actual de OpenGL usando 'ident' (glColor3ub)
-   // .....
+   const unsigned char
+    byteR=( ident           )%0x100U, //rojo=byte menos significativo
+    byteG=( ident / 0x100U  )%0x100U, //verde=byte intermedio
+    byteB=( ident / 0x10000U)%0x100U; //azul=byte más significativo (el 0)
 
+    glColor3ub(byteR,byteG,ByteB);
 }
 //---------------
 
 int LeerIdentEnPixel( int xpix, int ypix )
 {
    // COMPLETAR: práctica 5: leer el identificador codificado en el color del pixel (x,y)
-   // .....
+   unsigned char bytes[3];
+   glReadPixels(xpix,ypix,1,1,GL_RGB_UNSIGNED_BYTE,(void *)bytes);
 
+   return bytes[0]+(0x100U*bytes[1])+(0x10000U*bytes[2]);
 }
 //---------------

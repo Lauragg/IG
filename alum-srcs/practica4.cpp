@@ -32,7 +32,8 @@ void P4_Inicializar(  )
    cout << "Creando objetos de la práctica 4 .... " << flush ;
 
    // COMPLETAR: práctica 4: inicializar objetos de la práctica 4
-   fuentes4.insertar(new FuenteDireccional(-10,30,Tupla4f{0.5,0.4,0,1.0}));
+   fuentes4.insertar(new FuenteDireccional(-10,30,Tupla4f{0.5,0.4,0,0.5}));
+   fuentes4.insertar(new FuentePosicional(Tupla3f{-7.5,0,0},Tupla4f{0.1,0.4,0.7,0.5}));
    objetos4[0]=new Peones();
    objetos4[1]=new CocaCola();
    cout << "hecho." << endl << flush ;

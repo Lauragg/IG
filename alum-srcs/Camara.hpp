@@ -13,6 +13,7 @@
 #include "tuplasg.hpp"
 #include "matrices-tr.hpp"
 
+const float epsilon = 1e-6 ;
 
 // *********************************************************************
 // clase: MarcoCoorVista

@@ -197,7 +197,19 @@ bool NodoGrafoEscena::buscarObjeto
 )
 {
    // COMPLETAR: práctica 5: buscar un sub-objeto con un identificador
-   // ........
+   assert(0<ident_busc);
+   if(identificador==ident_busc){
+      centro_wc=mmodelado*leerCentroOC();
+      if(objeto!=nullptr)
+        *objeto=this;
+      return true;
+   }else{
+     bool encontrado=false;
+     for(unsigned i=0; i<entradas.size() && !encontrado ;i++){
+       encontrado=entradas[i].buscarObjeto(ident_busc,mmodelado,objeto,centro_wc);
+     }
+     return encontrado;
+   }
 
 }
 
@@ -372,6 +384,8 @@ Peones::PeonNegro::PeonNegro(){
 Peones::Peones(){
   agregar(new PeonMadera());
   agregar(new PeonBlanco());
+  agregar(new PeonNegro());
+  agregar(MAT_Traslacion(Tupla3f{-15,0.0,0.0}));
   agregar(new PeonNegro());
 
 }

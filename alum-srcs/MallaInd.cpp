@@ -268,11 +268,6 @@ void MallaInd::visualizarGL( ContextoVis & cv )
       sombra = GL_FLAT;
       uso=2;
       break;
-    case modoColorNodoSuave:
-      mode = GL_FILL;
-      sombra = GL_SMOOTH;
-      uso=2;
-      break;
     case modoAlambre:  // modo por defecto
     default:
       mode = GL_LINE;

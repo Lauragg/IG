@@ -155,7 +155,7 @@ Material::Material()
 
 Material::Material( const std::string & nombreArchivoJPG )
 {
-   iluminacion    = false ;
+   iluminacion    = true ; //Originalmente venía con true
    tex            = new Textura( nombreArchivoJPG ) ;
 
    coloresCero();
@@ -204,13 +204,13 @@ Material::Material( const Tupla3f & colorAmbDif, float ka, float kd, float ks, f
    tex=nullptr;
    iluminacion=true;
    coloresCero();
-
-   glColor3fv(colorAmbDif); //Establecemos el color que queremos utilizar a partir de ahora.
-   glColorMaterial(GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE);
+   color=Tupla4f{colorAmbDif[0],colorAmbDif[1],colorAmbDif[2],1.0};
+   //glColor3fv(colorAmbDif); //Establecemos el color que queremos utilizar a partir de ahora.
+   //glColorMaterial(GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE);
    //Hacemos que el color ambiental y el difuso sean ese color que hemos establecido.
 
-   tra.ambiente=del.ambiente  = VectorRGB( ka, ka, ka, 1.0);
-   tra.difusa=del.difusa    = VectorRGB( kd, kd, kd, 1.0 );
+   tra.ambiente=del.ambiente  = VectorRGB( ka*colorAmbDif[0], ka*colorAmbDif[1], ka*colorAmbDif[2], 1.0);
+   tra.difusa=del.difusa    = VectorRGB( kd*colorAmbDif[0], kd*colorAmbDif[1], kd*colorAmbDif[2], 1.0 );
    tra.especular=del.especular = VectorRGB( ks, ks, ks, 1.0 );
    tra.exp_brillo=del.exp_brillo = exp;
 
@@ -541,22 +541,23 @@ ColFuentesLuz::~ColFuentesLuz()
 ************************************************************************/
 MaterialLata::MaterialLata()
  : Material(new Textura("../imgs/lata-coke.jpg"),0.0,1,1,1){
-
+   color=Tupla4f{0.5,0.5,0.5,1.0};
 }
 MaterialTapasLata::MaterialTapasLata()
- : Material(NULL,0.0,1,1,1){
-   del.emision=tra.emision=Tupla4f{0.2,0.2,0.2,1.0};
+ : Material(Tupla3f{1,0.2,0.2},0.0,1,1,1){
+   color=Tupla4f{1,0.2,0.2,1.0};
 }
 MaterialPeonMadera::MaterialPeonMadera()
 : Material(new Textura("../imgs/text-madera.jpg"),0.0,1,1,1){
-  del.emision=tra.emision=Tupla4f{0.5,0.5,0.5,1.0};
+  color=Tupla4f{0.5,0.5,0.5,1.0};
 }
 MaterialPeonBlanco::MaterialPeonBlanco()
-: Material(NULL,0.0,1,0,0){
-  del.emision=tra.emision=Tupla4f{0.9,0.9,0.9,1.0};
+: Material(Tupla3f{0.9,0.9,0.9},0.9,1,0,0){
+  //color=Tupla4f{0.9,0.9,0.9,1.0};
 
 }
 MaterialPeonNegro::MaterialPeonNegro()
-: Material(nullptr,0,0.2,1,1) {
-  del.emision=tra.emision=Tupla4f{0.0,0.0,0.0,1.0};
+: Material(Tupla3f{0.0,0.0,0.0},0,0.05,0.2,0.2) {
+  //color=Tupla4f{0.0,0.0,0.0,1.0};
+
 }

@@ -118,7 +118,7 @@ void MallaRevol::crearTablaTextura(){
 
   for(unsigned i=0; i<nper;i++){
     for(unsigned j=0; j<nvp;j++){
-      coordenadas_textura.push_back(Tupla2f{(float)i/(float)(nper-1),distancia[j]/distancia[nvp-1]});
+      coordenadas_textura.push_back(Tupla2f{(float)i/(float)(nper-1),1-distancia[j]/distancia[nvp-1]});
     }
   }
   std::cout<<"Creada Tabla Textura"<<std::endl;
