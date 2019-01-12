@@ -70,6 +70,7 @@ class MallaInd : public Objeto3D
       //Visualizar con Draw Elements, Normales y Texturas.
       void visualizarDE_NT();
       void visualizarVBOs_NT();
+      void calcularCentroOC();
    public:
       // crea una malla vacía (nombre: "malla indexada nueva vacía")
       MallaInd() ;

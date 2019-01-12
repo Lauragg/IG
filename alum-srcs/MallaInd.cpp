@@ -8,6 +8,7 @@
 #include <aux.hpp>
 #include <tuplasg.hpp>
 #include "MallaInd.hpp"   // declaración de 'ContextoVis'
+#include <algorithm>
 
 // *****************************************************************************
 // funciones auxiliares
@@ -20,6 +21,7 @@ MallaInd::MallaInd(): MallaInd("malla indexada, anónima")
 {
    // 'identificador' puesto a 0 por defecto, 'centro_oc' puesto a (0,0,0)
   //ponerNombre("malla indexada, anónima");
+
 }
 // -----------------------------------------------------------------------------
 
@@ -27,6 +29,8 @@ MallaInd::MallaInd( const std::string & nombreIni )
 {
    // 'identificador' puesto a 0 por defecto, 'centro_oc' puesto a (0,0,0)
   ponerNombre(nombreIni) ;
+  ponerIdentificador(0);
+  ponerCentroOC(Tupla3f{0,0,0});
   vbo_creado=false;
   id_vbo_ver=id_vbo_tri=0;
   id_vbo_color_ver=id_vbo_normal_ver=id_vbo_textura_ver=0;
@@ -102,7 +106,7 @@ void MallaInd::crearVBOs(){
 
 void MallaInd::ponerColores(){
   //Creamos vector de colores e inicializamos
-  //color_ver.clear();
+  color_ver.clear();
   //std::cout << "Numero Vertices " << num_ver << std::flush;
   for(unsigned i=0; i<num_ver; i++)
     color_ver.push_back(Tupla3f{1.0,0.0,(float)(i)/(num_ver)});
@@ -146,10 +150,10 @@ void MallaInd::visualizarDE_MI( ContextoVis & cv )
     glNormalPointer(GL_FLOAT,0,normal_ver.data());
   }
   //Habilitar y especificar colores.
-  if(color_ver.size()>0){
+  //if(color_ver.size()>0){
     glEnableClientState(GL_COLOR_ARRAY);
     glColorPointer(3,GL_FLOAT,0,color_ver.data());
-  }
+  //}
 
   // habilitar uso de un array de vértices
   glEnableClientState(GL_VERTEX_ARRAY);
@@ -253,6 +257,16 @@ void MallaInd::visualizarGL( ContextoVis & cv )
     case modoSolido:
       mode = GL_FILL;
       sombra = GL_SMOOTH;
+      /*if(cv.modoSeleccionRB){
+        BufferSeleccion::getInstance().inicioModoSel();
+        if(leerIdentificador()!=-1){
+          glLoadName(leerIdentificador());
+        }
+      }else*/ if (cv.modoSeleccionFBO){ //Sobre el backbuffer
+        if(leerIdentificador()!=-1){
+          FijarColorIdent(leerIdentificador());
+        }
+      }
       break;
     case modoPuntos:
       mode = GL_POINT;
@@ -268,6 +282,12 @@ void MallaInd::visualizarGL( ContextoVis & cv )
       sombra = GL_FLAT;
       uso=2;
       break;
+  /*  case modoSeleccion:
+      mode = GL_FILL;
+      sombra = GL_FLAT;
+      glColor3ub(0,0,0);
+
+      break;*/
     case modoAlambre:  // modo por defecto
     default:
       mode = GL_LINE;
@@ -277,10 +297,10 @@ void MallaInd::visualizarGL( ContextoVis & cv )
   glPolygonMode(GL_FRONT_AND_BACK, mode);
   glShadeModel(sombra);
 
-  if(color_ver.empty()){
+  //if(color_ver.empty()){
     ponerColores();
     //std::cout << "entro" <<std::flush;
-  }
+  //}
   if(normal_ver.empty()){
     calcular_normales();
   }
@@ -302,6 +322,53 @@ void MallaInd::visualizarGL( ContextoVis & cv )
     default:
       visualizarDE_MI(cv);
   }
+
+}
+
+void MallaInd::calcularCentroOC(){
+  std::vector<Tupla3f> cajaEnglobante(8,Tupla3f{0.0,0.0,0.0});
+  for(auto vertice : vertices){
+     //CALCULAMOS LAS COORDENADAS DE LA CAJA CON MÁXIMOS Y MÍNIMOS
+     //DE CADA UNA DE LAS COORDENADAS DE CADA UNO DE LOS OBJETOS.
+    cajaEnglobante[0]=Tupla3f{
+      std::min(cajaEnglobante[0](0),vertice(0)),
+      std::min(cajaEnglobante[0](1),vertice(1)),
+      std::min(cajaEnglobante[0](2),vertice(2))};
+    cajaEnglobante[1]=Tupla3f{
+      std::min(cajaEnglobante[1](0),vertice(0)),
+      std::min(cajaEnglobante[1](1),vertice(1)),
+      std::max(cajaEnglobante[1](2),vertice(2))};
+    cajaEnglobante[2]=Tupla3f{
+      std::min(cajaEnglobante[2](0),vertice(0)),
+      std::max(cajaEnglobante[2](1),vertice(1)),
+      std::min(cajaEnglobante[2](2),vertice(2))};
+    cajaEnglobante[3]=Tupla3f{
+      std::max(cajaEnglobante[3](0),vertice(0)),
+      std::min(cajaEnglobante[3](1),vertice(1)),
+      std::min(cajaEnglobante[3](2),vertice(2))};
+    cajaEnglobante[4]=Tupla3f{
+      std::max(cajaEnglobante[4](0),vertice(0)),
+      std::min(cajaEnglobante[4](1),vertice(1)),
+      std::max(cajaEnglobante[4](2),vertice(2))};
+    cajaEnglobante[5]=Tupla3f{
+      std::min(cajaEnglobante[5](0),vertice(0)),
+      std::max(cajaEnglobante[5](1),vertice(1)),
+      std::max(cajaEnglobante[5](2),vertice(2))};
+    cajaEnglobante[6]=Tupla3f{
+      std::max(cajaEnglobante[6](0),vertice(0)),
+      std::max(cajaEnglobante[6](1),vertice(1)),
+      std::min(cajaEnglobante[6](2),vertice(2))};
+    cajaEnglobante[7]=Tupla3f{
+      std::max(cajaEnglobante[7](0),vertice(0)),
+      std::max(cajaEnglobante[7](1),vertice(1)),
+      std::max(cajaEnglobante[7](2),vertice(2))};
+
+   }
+
+   for(auto punto : cajaEnglobante){
+     ponerCentroOC(leerCentroOC()+punto);
+   }
+   ponerCentroOC(leerCentroOC()/cajaEnglobante.size());
 }
 // *****************************************************************************
 

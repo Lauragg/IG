@@ -31,6 +31,7 @@ typedef enum
    modoColorNodoPlano,
    //modoColorNodoSuave, //NUEVO
    modoMateriales,
+   //modoSeleccion,
    numModosVis
 }
    ModosVis;
@@ -45,6 +46,7 @@ const std::string nombreModo[numModosVis] =
       "modoColorNodoPlano",
       //"modoColorNodoSuave", //NUEVO
       "modoMateriales"
+    //  "modoSeleccion"
    } ;
 
 // --------------------------------------------------------------------
@@ -86,6 +88,48 @@ void FGE_Desocupado() ;
 void FijarColorIdent( const int ident ) ; // 0 ≤ ident < 2
 int  LeerIdentEnPixel( int xpix, int ypix );
 
+/*class BufferSeleccion{
+  private:
+    BufferSeleccion(){}
+    BufferSeleccion(BufferSeleccion const & copy);
+    BufferSeleccion & operator=(BufferSeleccion const & copy);
+
+  public:
+    static BufferSeleccion & getInstance(){
+      static BufferSeleccion instance;
+      return instance;
+    }
+
+    static const GLsizei tamB=1024; //tamaño del buffer (==4 Kb p. ej.)
+    GLuint vec[tamB]; //vector de entradas enteras (buffer)
+
+    //variables calculadas en finModoSel:
+    int numNombres; //número de nombres (bloques) en el buffer
+    GLuint * nombreMin; //puntero al nombre más cercano (dentro de vec)
+    int longNombreMin; //longitud de nombreMin
+
+    //métodos:
+    //BufferSeleccion(){} //Vamos a ver. En las diapos pone que es Singleton y luego me declaras esto público. Aclárate.
+    void inicioModoSel(){
+      glSelectBuffer(tamB,vec); //decirle a OpenGL donde está el buffer de selección.
+      glRenderMode(GL_SELECT); // entrar en modo seleccion
+      glInitNames();          // vacía la pila de nombres
+    }
+    void finModoSel(){ // fin del modo selección
+      int profZmin; //mínima profundidad hasta el momento
+      GLuint * bloque=vec; //puntero a la base del bloque actual del buffer
+      numNombres = glRenderMode(GL_RENDER); //lee núm. de bloques, volver modo render
+      for(unsigned i=0; i< numNombres; i++){
+        if(i==0 || bloque[1] < profZmin){ //si la profundidad es menor
+          profZmin=bloque[1]; //guardar nueva prof. mínima
+          longNombreMin=bloque[0]; //registar longitud del nombre
+          nombreMin=&(bloque[3]); //registrar puntero a nombre mínimo
+        }
+        bloque+=bloque[0]+3; //avanzar puntero a la base del bloque siguiente
+      }
+
+    }
+};*/
 
 
 

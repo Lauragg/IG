@@ -23,6 +23,7 @@
 #include "shaders.hpp"
 #include "grafo-escena.hpp"
 #include <typeinfo>
+#include <algorithm>
 
 using namespace std ;
 
@@ -108,7 +109,7 @@ void NodoGrafoEscena::visualizarGL( ContextoVis & cv )
 NodoGrafoEscena::NodoGrafoEscena()
 {
    // COMPLETAR: práctica 3: inicializar un nodo vacío (sin entradas)
-   // ........
+   centro_calculado=false;
 
 }
 // -----------------------------------------------------------------------------
@@ -182,7 +183,56 @@ void NodoGrafoEscena::calcularCentroOC()
    // COMPLETAR: práctica 5: calcular y guardar el centro del nodo
    //    en coordenadas de objeto (hay que hacerlo recursivamente)
    //   (si el centro ya ha sido calculado, no volver a hacerlo)
-   // ........
+  std::vector<Tupla3f> cajaEnglobante(8,Tupla3f{0.0,0.0,0.0});
+  for(auto entrada : entradas){
+    if(entrada.tipo==TipoEntNGE::objeto){
+      entrada.objeto->calcularCentroOC();
+       //CALCULAMOS LAS COORDENADAS DE LA CAJA CON MÁXIMOS Y MÍNIMOS
+       //DE CADA UNA DE LAS COORDENADAS DE CADA UNO DE LOS OBJETOS.
+      cajaEnglobante[0]=Tupla3f{
+        min(cajaEnglobante[0](0),entrada.objeto->leerCentroOC()(0)),
+        min(cajaEnglobante[0](1),entrada.objeto->leerCentroOC()(1)),
+        min(cajaEnglobante[0](2),entrada.objeto->leerCentroOC()(2))};
+      cajaEnglobante[1]=Tupla3f{
+        min(cajaEnglobante[1](0),entrada.objeto->leerCentroOC()(0)),
+        min(cajaEnglobante[1](1),entrada.objeto->leerCentroOC()(1)),
+        max(cajaEnglobante[1](2),entrada.objeto->leerCentroOC()(2))};
+      cajaEnglobante[2]=Tupla3f{
+        min(cajaEnglobante[2](0),entrada.objeto->leerCentroOC()(0)),
+        max(cajaEnglobante[2](1),entrada.objeto->leerCentroOC()(1)),
+        min(cajaEnglobante[2](2),entrada.objeto->leerCentroOC()(2))};
+      cajaEnglobante[3]=Tupla3f{
+        max(cajaEnglobante[3](0),entrada.objeto->leerCentroOC()(0)),
+        min(cajaEnglobante[3](1),entrada.objeto->leerCentroOC()(1)),
+        min(cajaEnglobante[3](2),entrada.objeto->leerCentroOC()(2))};
+      cajaEnglobante[4]=Tupla3f{
+        max(cajaEnglobante[4](0),entrada.objeto->leerCentroOC()(0)),
+        min(cajaEnglobante[4](1),entrada.objeto->leerCentroOC()(1)),
+        max(cajaEnglobante[4](2),entrada.objeto->leerCentroOC()(2))};
+      cajaEnglobante[5]=Tupla3f{
+        min(cajaEnglobante[5](0),entrada.objeto->leerCentroOC()(0)),
+        max(cajaEnglobante[5](1),entrada.objeto->leerCentroOC()(1)),
+        max(cajaEnglobante[5](2),entrada.objeto->leerCentroOC()(2))};
+      cajaEnglobante[6]=Tupla3f{
+        max(cajaEnglobante[6](0),entrada.objeto->leerCentroOC()(0)),
+        max(cajaEnglobante[6](1),entrada.objeto->leerCentroOC()(1)),
+        min(cajaEnglobante[6](2),entrada.objeto->leerCentroOC()(2))};
+      cajaEnglobante[7]=Tupla3f{
+        max(cajaEnglobante[7](0),entrada.objeto->leerCentroOC()(0)),
+        max(cajaEnglobante[7](1),entrada.objeto->leerCentroOC()(1)),
+        max(cajaEnglobante[7](2),entrada.objeto->leerCentroOC()(2))};
+
+     }
+
+   }
+
+   for(auto punto : cajaEnglobante){
+    ponerCentroOC(leerCentroOC()+punto);
+   }
+   ponerCentroOC(leerCentroOC()/cajaEnglobante.size());
+   centro_calculado=true;
+
+
 
 }
 // -----------------------------------------------------------------------------
@@ -198,7 +248,10 @@ bool NodoGrafoEscena::buscarObjeto
 {
    // COMPLETAR: práctica 5: buscar un sub-objeto con un identificador
    assert(0<ident_busc);
-   if(identificador==ident_busc){
+   if(!centro_calculado){
+     calcularCentroOC();
+   }
+   if(leerIdentificador()==ident_busc){
       centro_wc=mmodelado*leerCentroOC();
       if(objeto!=nullptr)
         *objeto=this;
@@ -206,7 +259,7 @@ bool NodoGrafoEscena::buscarObjeto
    }else{
      bool encontrado=false;
      for(unsigned i=0; i<entradas.size() && !encontrado ;i++){
-       encontrado=entradas[i].buscarObjeto(ident_busc,mmodelado,objeto,centro_wc);
+       encontrado=entradas[i].objeto->buscarObjeto(ident_busc,mmodelado,objeto,centro_wc);
      }
      return encontrado;
    }

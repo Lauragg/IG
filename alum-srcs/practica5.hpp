@@ -17,6 +17,7 @@ bool P5_FGE_PulsarTeclaEspecial(  int tecla ) ;
 bool P5_FGE_ClickRaton( int boton, int estado, int x, int y );
 bool P5_FGE_RatonMovidoPulsado( int x, int y );
 bool P5_FGE_Scroll( int direction );
+void P5_modo_Seleccion();
 
 
 #endif

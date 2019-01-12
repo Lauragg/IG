@@ -152,24 +152,39 @@ bool P5_FGE_PulsarTeclaEspecial(  int tecla  )
 // ---------------------------------------------------------------------
 // se llama al hacer click con el botón izquierdo
 
-void P5_ClickIzquierdo( int x, int y )
+bool P5_ClickIzquierdo( int x, int y )
 {
 
    // COMPLETAR: práctica 5: visualizar escena en modo selección y leer el color del pixel en (x,y)
 
    // 1. crear un 'contextovis' apropiado
    ContextoVis contextovis;
-   contextovis.modoSeleccionRB=true; // true -> dibujando en modo selección usando render buffer de opengl
-   //contextovis.modoSeleccionFBO=true; // true -> dibujando en modo selección con FBO invisible (puede ser el back-buffer)
+   contextovis.modoVis=modoSolido;
+   //contextovis.modoSeleccionRB=true;// true -> dibujando en modo selección usando render buffer de opengl
+   contextovis.modoSeleccionFBO=true; // true -> dibujando en modo selección con FBO invisible (puede ser el back-buffer)
+   glColor3ub(0,0,0);
 
    // 2. visualizar en modo selección (sobre el backbuffer)
-   // ....
+   P5_DibujarObjetos(contextovis);
 
    // 3. leer el color del pixel, si es 0 no se hace nada
-   // .....
+   int identificador=LeerIdentEnPixel(x,y);
+   if(identificador==0){
+     std::cout<<"No se ha seleccionado ningún objeto"<<std::endl;
+     return false;
+   }
 
    // 4. buscar el objeto en el grafo de escena e informar del mismo
-   // .....
+   Objeto3D * objeto;
+   Tupla3f centro;
+   bool encontrado=objetos5[objetoActivo5]->buscarObjeto(identificador,MATRIZMODADO?,&objeto,centro);
+   if(encontrado){
+     std::cout <<"El objeto seleccionado es: " <<objeto->leerNombre() << "\nSu identificador es: " << objeto->leerIdentificador()<<std::endl;
+     modoExaminar() //TERMINAR
+   }
+
+}
+void P5_modo_Seleccion(){
 
 }
 // --------------------------------------------------------------------
@@ -190,7 +205,7 @@ void P5_InicioModoArrastrar( int x, int y )
 void P5_FinModoArrastrar()
 {
    // COMPLETAR: práctica 5: desactivar bool del modo arrastrar
-   camaras[camaraActiva]->modo_arrastrar=false;
+   modo_arrastrar=false;
 
 }
 // ---------------------------------------------------------------------
@@ -236,7 +251,7 @@ bool P5_FGE_RatonMovidoPulsado( int x, int y )
 bool P5_FGE_Scroll( int direction )
 {
    // COMPLETAR: práctica 5: acercar/alejar la camara (desplaZ)
-   camaras[camaraActiva]->desplaZ(direction)
+   camaras[camaraActiva]->desplaZ(direction);
 
    return true ;
 }
@@ -250,7 +265,7 @@ void FijarColorIdent( const int ident )  // 0 ≤ ident < 2^24
     byteG=( ident / 0x100U  )%0x100U, //verde=byte intermedio
     byteB=( ident / 0x10000U)%0x100U; //azul=byte más significativo (el 0)
 
-    glColor3ub(byteR,byteG,ByteB);
+    glColor3ub(byteR,byteG,byteB);
 }
 //---------------
 
@@ -258,7 +273,7 @@ int LeerIdentEnPixel( int xpix, int ypix )
 {
    // COMPLETAR: práctica 5: leer el identificador codificado en el color del pixel (x,y)
    unsigned char bytes[3];
-   glReadPixels(xpix,ypix,1,1,GL_RGB_UNSIGNED_BYTE,(void *)bytes);
+   glReadPixels(xpix,ypix,1,1,GL_RGB,GL_UNSIGNED_BYTE,(void *)bytes);
 
    return bytes[0]+(0x100U*bytes[1])+(0x10000U*bytes[2]);
 }

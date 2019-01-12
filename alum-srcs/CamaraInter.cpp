@@ -93,15 +93,14 @@ void CamaraInteractiva::calcularMarcoCamara()
    //    (3) recalcular matrices marco camara
 
 //(1) Asumo que longi y lati ya están en radianes.
-  Matriz4f matriz=MAT_Traslacion(aten)*MAT_Rotacion(longi,0.0,1.0,0.0)
+  Matriz4f matriz=MAT_Traslacion(aten)*MAT_Rotacion(longi,0.0,1.0,0.0) //(¿dividir longi y lati entre /(2*M_PI))
   *MAT_Rotacion(-lati,1.0,0.0,0.0)*MAT_Traslacion(0,0,dist);
 
 //(2)
 
-/*  mcv.eje[0]=mcv.eje[0]*matriz;
-  mcv.eje[1]=mcv.eje[1]*matriz;
-  mcv.eje[2]=mcv.eje[2]*matriz;*/
-
+  mcv.eje[0]=matriz*mcv.eje[0];
+  mcv.eje[1]=matriz*mcv.eje[1];
+  mcv.eje[2]=matriz*mcv.eje[2];
 
 //(3)
   recalcularMatrMCV();
@@ -135,6 +134,9 @@ constexpr float urot  = 1,    // unidad de rotación (1 grado)
 void CamaraInteractiva::moverHV( float nh, float nv )
 {
    using namespace std ;
+   if(nh==0 && nv==0)
+    return ;
+
    if ( examinar ) // examinar
    {
       // COMPLETAR: práctica 5: actualizar 'longi' y 'lati' y recalcular marco de cámara
